@@ -38,3 +38,29 @@ def spin(message):
         bot.send_message(message.chat.id, f"🎉 {reward_text}")
 
 bot.polling()
+from PIL import Image
+import telebot
+import time
+import os
+
+def send_spinning_animation(bot, chat_id):
+    wheel = Image.open("wheel.png")
+
+    frame_paths = []
+
+    # Create 8 rotated frames
+    for angle in range(0, 360, 45):
+        frame = wheel.rotate(angle, expand=True)
+        frame_path = f"frame_{angle}.png"
+        frame.save(frame_path)
+        frame_paths.append(frame_path)
+
+    # Send frames one-by-one (animation effect)
+    for frame in frame_paths:
+        bot.send_photo(chat_id, open(frame, "rb"), caption="🎡 Spinning…")
+        time.sleep(0.15)  # speed of animation
+        bot.delete_message(chat_id, bot.get_updates()[-1].message.message_id)
+
+    # Cleanup frames
+    for frame in frame_paths:
+        os.remove(frame)
